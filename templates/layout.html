@@ -1,10 +1,41 @@
 <!doctype html>
-<title>Flaskr</title>
-<link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
-<div class=page>
-  <h1>Spectrum</h1>
+<html>
+<head>
+  <title>Spectrum: Dynamic Spectrum Marketplace Demo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel=stylesheet media="screen" type=text/css href="{{ url_for('static', filename='bootstrap/css/bootstrap.min.css') }}">
+  <link rel=stylesheet media="screen" type=text/css href="{{ url_for('static', filename='bootstrap/css/bootstrap-responsive.min.css') }}">
+</head>
+<body>
+  <div class="navbar navbar-fixed-top">
+    <div class="navbar-inner">
+      <div class="container">
+        <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </a>
+        <a class="brand" href="">Spectrum</a>
+        <div class="nav-collapse">
+          <ul class="nav">
+            <li><a href="./docs/">Documentation</a></li>
+            <li><a href="./requests/">Requests</a></li>
+            <li><a href="./contracts/">Contracts</a></li>
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
   {% for message in get_flashed_messages() %}
     <div class=flash>{{ message }}</div>
   {% endfor %}
   {% block body %}{% endblock %}
-</div>
+  </div>
+
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.2/jquery.min.js"></script>
+  <script src="{{ url_for('static', filename='bootstrap/js/bootstrap.min.js') }}"></script>
+</body>
+</html>
