@@ -78,6 +78,32 @@ def show_homepage():
     return render_template('index.html')
 
 
+@app.route('/docs/')
+def show_docs():
+    return render_template('docs.html')
+
+
+@app.route('/offers/', methods=['GET'])
+def show_requests():
+    return render_template('offers.html')
+
+
+@app.route('/offers/', methods=['POST'])
+def create_request():
+    db = get_db()
+    cur = db.execute('INSERT INTO offers VALUES (?, ?)', 
+        (None, '{}'))
+    db.commit()
+    offer_id = cur.lastrowid
+    print "OFFERID", offer_id
+    return render_template('offer_created.html', offer_id=offer_id), 201
+
+
+@app.route('/contracts/')
+def show_contracts():
+    return render_template('contracts.html')
+
+
 if __name__ == '__main__':
     init_db()
     app.run()
