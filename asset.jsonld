@@ -1,0 +1,40 @@
+{
+  "id": "",
+  "type": ["Asset", "Spectrum"],
+  "creator": {
+    "fullName": "Spectrum Marketplace Demo"
+  },
+  "title": "Spectrum",
+  "assetProvider": "",
+  "spectrum": {
+    "transmitPower": "20",
+    "centerFrequency": "100000000",
+    "occupiedBandwidth": "1000000"
+  },
+  "listingRestrictions": {
+  "validFrom": "",
+  "validUntil": "",
+  "payee": [{
+      "id": "",
+      "type": "Payee",
+      "destination": "",
+      "currency": "USD",
+      "payeeGroup": ["assetProvider"],
+      "payeeRate": "80",
+      "payeeRateType": "Percentage",
+      "payeeApplyType": "ApplyInclusively",
+      "payeeApplyGroup": ["vendor"],
+      "minimumAmount": "0.01",
+      "comment": "Spectrum Market Royalty"
+  }],
+  "payeeRule": [{
+      "type": "PayeeRule",
+      "payeeGroupPrefix": ["authority"]
+      }, {
+      "type": "PayeeRule",
+      "payeeGroup": ["vendor"],
+      "payeeRateType": "FlatAmount",
+      "payeeApplyType": "ApplyExclusively"
+      }]
+  }
+}

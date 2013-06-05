@@ -29,10 +29,10 @@
     :license: BSD, see LICENSE for more details.
 """
 
-import os.path
+import os.path, json
 from sqlite3 import dbapi2 as sqlite3
 from flask import Flask, request, session, g, redirect, url_for, abort, \
-     render_template, flash, _app_ctx_stack
+     jsonify, render_template, flash, _app_ctx_stack, make_response
 
 # configuration
 DATABASE = os.path.join(os.path.dirname(__file__), 'spectrum.db')
@@ -84,9 +84,22 @@ def show_docs():
 
 
 @app.route('/offers/', methods=['GET'])
-def show_requests():
+def show_offers():
     return render_template('offers.html')
 
+@app.route('/offers/<offer_id>', methods=['GET'])
+def show_offers(offer_id):
+    db = get_db()
+    cur = db.execute('SELECT offer FROM offers WHERE id=?', 
+        (offer_id))
+
+    headers = {
+#        'Content-Type': 'application/ld+json'
+        'Content-Type': 'text/plain'
+    }
+    
+    offer = cur.fetchone()[0]
+    return (offer, 200, headers)
 
 @app.route('/offers/', methods=['POST'])
 def create_request():
@@ -95,8 +108,26 @@ def create_request():
         (None, '{}'))
     db.commit()
     offer_id = cur.lastrowid
-    print "OFFERID", offer_id
-    return render_template('offer_created.html', offer_id=offer_id), 201
+   
+    assetUrl = 'http://localhost:5000/offers/' + str(offer_id)
+    assetFile = open('asset.jsonld', 'r')
+    asset = json.loads(assetFile.read())
+
+    
+    listingUrl = 'http://localhost:5000/offers/' + str(offer_id)
+    listingFile = open('listing.jsonld', 'r')
+    listing = json.loads(listingFile.read())
+    
+    assetAndListing = {
+        '@context': ['https://w3id.org/payswarm/v1', 'https://w3id.org/spectrum/v1'],
+        '@graph': [asset, listing]
+    }
+    
+    cur = db.execute('UPDATE offers SET offer=? WHERE id=?', 
+        (json.dumps(assetAndListing, indent=2), offer_id))
+    db.commit()
+      
+    return render_template('offer_created.html', offer_id=offer_id),  201
 
 
 @app.route('/contracts/')
@@ -105,5 +136,6 @@ def show_contracts():
 
 
 if __name__ == '__main__':
-    init_db()
+    if(not os.path.exists('spectrum.db')):
+        init_db()
     app.run()
