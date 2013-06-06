@@ -15,7 +15,7 @@
   }],
   "payeeRule": [{
     "type": "PayeeRule",
-    "payeeGroupPrefi": ["authority"],
+    "payeeGroupPrefix": ["authority"],
     "maximumPayeeRate": "10",
     "payeeRateType": "Percentage",
     "payeeApplyType": "ApplyInclusively"

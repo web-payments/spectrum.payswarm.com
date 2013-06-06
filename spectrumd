@@ -29,7 +29,7 @@
     :license: BSD, see LICENSE for more details.
 """
 
-import os.path, json
+import os.path, json, time
 from sqlite3 import dbapi2 as sqlite3
 from flask import Flask, request, session, g, redirect, url_for, abort, \
      jsonify, render_template, flash, _app_ctx_stack, make_response
@@ -37,11 +37,31 @@ from flask import Flask, request, session, g, redirect, url_for, abort, \
 # configuration
 DATABASE = os.path.join(os.path.dirname(__file__), 'spectrum.db')
 DEBUG = True
+IDENTITY = 'https://dev.payswarm.com/i/spectrum-market'
+ACCOUNT = 'https://dev.payswarm.com/i/spectrum-market/accounts/auctions'
 
 # Spectrum marketplace application
 app = Flask(__name__)
 app.config.from_object(__name__)
 app.config.from_envvar('SPECTRUMD_SETTINGS', silent=True)
+
+import datetime
+
+def w3cdatetime(i):
+    """ Output datetime in RFC 3339 format that is also valid ISO 8601
+        timestamp representation"""
+    year, month, day, hour, minute, second, wday, jday, dst = time.gmtime(i)
+    o = str(year)
+    if (month, day, hour, minute, second) == (1, 1, 0, 0, 0): return o
+    o = o + '-%2.2d' % month
+    if (day, hour, minute, second) == (1, 0, 0, 0): return o
+    o = o + '-%2.2d' % day
+    if (hour, minute, second) == (0, 0, 0): return o
+    o = o + 'T%2.2d:%2.2d' % (hour, minute)
+    if second != 0:
+        o = o + ':%2.2d' % second
+    o = o + 'Z'
+    return o
 
 def init_db():
     """Creates the database tables."""
@@ -108,18 +128,51 @@ def create_request():
         (None, '{}'))
     db.commit()
     offer_id = cur.lastrowid
-   
+
     assetUrl = 'http://localhost:5000/offers/' + str(offer_id)
     assetFile = open('asset.jsonld', 'r')
     asset = json.loads(assetFile.read())
-
+    listingRestrictions = asset['listingRestrictions']
+    payee = listingRestrictions['payee'][0]
     
+    # FIXME: set spectrum parameters
+    
+    asset['id'] = assetUrl + '#asset'
+    asset['assetProvider'] = IDENTITY
+    asset['title'] = "Spectrum - %1.3f Mhz centered at %1.3f Mhz, %1.3f dBm" % \
+        (int(asset['spectrum']['occupiedBandwidth'])/1000000, 
+        int(asset['spectrum']['centerFrequency'])/1000000, 
+        float(asset['spectrum']['transmitPower']))
+    
+    payee['id'] = assetUrl + '#payee'
+    payee['destination'] = ACCOUNT
+    
+    listingRestrictions['validFrom'] = w3cdatetime(time.time())
+    listingRestrictions['validUntil'] = w3cdatetime(time.time() + 60*60*24)
+
     listingUrl = 'http://localhost:5000/offers/' + str(offer_id)
     listingFile = open('listing.jsonld', 'r')
     listing = json.loads(listingFile.read())
     
+    listing['id'] = listingUrl + '#listing'
+    listing['asset'] = assetUrl + '#asset'
+    listing['vendor'] = IDENTITY
+    listing['validFrom'] = w3cdatetime(time.time())
+    listing['validUntil'] = w3cdatetime(time.time() + 60*60*24)
+    
+    listingPayee = listing['payee'][0]
+    listingPayee['id'] = listingUrl + '#listing-payee-1'
+    listingPayee['comment'] = \
+        "Spectrum payment for %1.3f Mhz centered at %1.3f Mhz, %1.3f dBm" % \
+        (int(asset['spectrum']['occupiedBandwidth'])/1000000, 
+        int(asset['spectrum']['centerFrequency'])/1000000, 
+        float(asset['spectrum']['transmitPower']))
+    listingPayee['payeeRate'] = '0.05'
+    listingPayee['destination'] = ACCOUNT
+
     assetAndListing = {
-        '@context': ['https://w3id.org/payswarm/v1', 'https://w3id.org/spectrum/v1'],
+        '@context': [
+            'https://w3id.org/payswarm/v1', 'https://w3id.org/spectrum/v1'],
         '@graph': [asset, listing]
     }
     
