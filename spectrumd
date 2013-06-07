@@ -35,7 +35,10 @@ from flask import Flask, request, session, g, redirect, url_for, abort, \
      jsonify, render_template, flash, _app_ctx_stack, make_response
 
 # configuration
+DATABASE_TEMPLATE = os.path.join(os.path.dirname(__file__), 'schema.sql')
 DATABASE = os.path.join(os.path.dirname(__file__), 'spectrum.db')
+ASSET_TEMPLATE = os.path.join(os.path.dirname(__file__), 'asset.jsonld')
+LISTING_TEMPLATE = os.path.join(os.path.dirname(__file__), 'listing.jsonld')
 DEBUG = True
 IDENTITY = 'https://dev.payswarm.com/i/spectrum-market'
 ACCOUNT = 'https://dev.payswarm.com/i/spectrum-market/accounts/auctions'
@@ -74,7 +77,7 @@ def init_db():
     """Creates the database tables."""
     with app.app_context():
         db = get_db()
-        with app.open_resource('schema.sql', mode='r') as f:
+        with app.open_resource(DATABASE_TEMPLATE, mode='r') as f:
             db.cursor().executescript(f.read())
         db.commit()
 
@@ -151,7 +154,7 @@ def create_request():
     offer_id = cur.lastrowid
 
     assetUrl = 'http://localhost:5000/offers/' + str(offer_id)
-    assetFile = open('asset.jsonld', 'r')
+    assetFile = open(ASSET_TEMPLATE, 'r')
     asset = json.loads(assetFile.read())
     listingRestrictions = asset['listingRestrictions']
     payee = listingRestrictions['payee'][0]
@@ -173,7 +176,7 @@ def create_request():
     listingRestrictions['validUntil'] = w3cdatetime(time.time() + 60*60*24)
 
     listingUrl = 'http://localhost:5000/offers/' + str(offer_id)
-    listingFile = open('listing.jsonld', 'r')
+    listingFile = open(LISTING_TEMPLATE, 'r')
     listing = json.loads(listingFile.read())
     
     listing['id'] = listingUrl + '#listing'
@@ -211,6 +214,6 @@ def show_contracts():
 
 
 if __name__ == '__main__':
-    if(not os.path.exists('spectrum.db')):
+    if(not os.path.exists(DATABASE)):
         init_db()
     app.run()
