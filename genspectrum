@@ -1,0 +1,56 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+'''
+    genspectrum
+
+    Generates a given number of spectrum blocks for sale.
+
+    :copyright: (c) 2013 by Digital Bazaar
+    :license: BSD, see LICENSE for more details.
+'''
+
+import sys, os.path, json, time, urllib2, datetime, random
+
+def w3cdatetime(i):
+    ''' Output datetime in RFC 3339 format that is also valid ISO 8601
+        timestamp representation'''
+    year, month, day, hour, minute, second, wday, jday, dst = time.gmtime(i)
+    o = str(year)
+    if (month, day, hour, minute, second) == (1, 1, 0, 0, 0): return o
+    o = o + '-%2.2d' % month
+    if (day, hour, minute, second) == (1, 0, 0, 0): return o
+    o = o + '-%2.2d' % day
+    if (hour, minute, second) == (0, 0, 0): return o
+    o = o + 'T%2.2d:%2.2d' % (hour, minute)
+    if second != 0:
+        o = o + ':%2.2d' % second
+    o = o + 'Z'
+    return o
+
+if __name__ == '__main__':
+    if(len(sys.argv) < 2):
+        print 'Usage:', sys.argv[0], 'number_of_spectrum_blocks'
+        print '    Example:', sys.argv[0], '10'
+        sys.exit(1)
+    
+    blocks = int(sys.argv[1])
+
+    while blocks > 0:
+        print 'Gen block', blocks
+        block = {
+          '@context': 'https://w3id.org/spectrum/v1',
+          'centerFrequency': str(random.randrange(50000000, 850000000, 1000)),
+          'occupiedBandwidth': str(random.randrange(1000000, 50000000, 1000)),
+          'transmitPower': str(random.randrange(5, 80, 1)),
+          'latitude': 37.2294 + random.uniform(-0.09, 0.09),
+          'longitude': 80.4142 + random.uniform(-0.09, 0.09),
+          'validFrom': w3cdatetime(time.time()),
+          'validUntil': w3cdatetime(time.time() + 60*60*24)
+        }
+        req = urllib2.Request('http://localhost:5000/offers/', 
+            json.dumps(block), {'Content-Type': 'application/ld+json'})
+        f = urllib2.urlopen(req)
+        response = f.read()
+        f.close()
+        blocks = blocks - 1
+
