@@ -33,6 +33,7 @@ import os.path, json, time
 from sqlite3 import dbapi2 as sqlite3
 from flask import Flask, request, session, g, redirect, url_for, abort, \
      jsonify, render_template, flash, _app_ctx_stack, make_response
+from flask_negotiate import consumes, produces
 
 # configuration
 DATABASE = os.path.join(os.path.dirname(__file__), 'spectrum.db')
@@ -62,6 +63,13 @@ def w3cdatetime(i):
         o = o + ':%2.2d' % second
     o = o + 'Z'
     return o
+
+def request_wants_jsonld():
+    best = request.accept_mimetypes \
+        .best_match(['application/ld+json', 'text/html'])
+    return best == 'application/ld+json' and \
+        request.accept_mimetypes[best] > \
+        request.accept_mimetypes['text/html']
 
 def init_db():
     """Creates the database tables."""
@@ -105,10 +113,24 @@ def show_docs():
 
 @app.route('/offers/', methods=['GET'])
 def show_offers():
-    return render_template('offers.html')
+    db = get_db()
+    offers = []
+
+    if(request_wants_jsonld()):
+        # return content-negotiated JSON-LD response
+        for row in db.execute('SELECT offer FROM offers ORDER BY id'):
+            offers.append(json.loads(row[0]))
+
+        return json.dumps(offers, indent=2)
+    else:
+        # return HTML if JSON-LD was not requested
+        for row in db.execute('SELECT id, offer FROM offers ORDER BY id'):
+            offers.append({'id': row[0], 'data': json.loads(row[1])})
+
+        return render_template('offers.html', offers=offers)
 
 @app.route('/offers/<offer_id>', methods=['GET'])
-def show_offers(offer_id):
+def show_offer(offer_id):
     db = get_db()
     cur = db.execute('SELECT offer FROM offers WHERE id=?', 
         (offer_id))
@@ -135,7 +157,8 @@ def create_request():
     listingRestrictions = asset['listingRestrictions']
     payee = listingRestrictions['payee'][0]
     
-    # FIXME: set spectrum parameters
+    # set spectrum parameters
+    asset['spectrum'] = json.loads(request.data)
     
     asset['id'] = assetUrl + '#asset'
     asset['assetProvider'] = IDENTITY

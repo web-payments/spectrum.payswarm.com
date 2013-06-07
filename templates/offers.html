@@ -1,12 +1,110 @@
 {% extends "layout.html" %}
 {% block body %}
 <div class="row">
-  <div class="span12">
-    <h2>Offers</h2>
+  <div class="offset1 span5">
+    <h2>Spectrum Block Request</h2>
 
-    <p>
-Offers go here.    
-    </p>
+    <form class="form-horizontal">
+      <fieldset>
+        <div class="control-group">
+          <label class="control-label" for="centerFrequency">Center Frequency</label>
+          <div class="controls">
+            <div class="input-append">
+              <input type="text" id="centerFrequency" placeholder="">
+              <span class="add-on">hz</span>
+            </div>
+          </div>
+        </div>
+        <div class="control-group">
+          <label class="control-label" for="occupiedBandwidth">Occupied Bandwidth</label>
+          <div class="controls">
+            <div class="input-append">
+              <input type="text" id="occupiedBandwidth" placeholder="">
+              <span class="add-on">hz</span>
+            </div>
+          </div>
+        </div>
+        <div class="control-group">
+          <label class="control-label" for="transmitPower">Transmit Power</label>
+          <div class="controls">
+            <div class="input-append">
+              <input type="text" id="transmitPower" placeholder="">
+              <span class="add-on">dBm</span>
+            </div>
+          </div>
+        </div>
+        <div class="control-group">
+          <label class="control-label" for="latitude">Latitude</label>
+          <div class="controls">
+            <div class="input-append">
+              <input type="text" id="latitude" placeholder="">
+              <span class="add-on">° (degrees N/S)</span>
+            </div>
+          </div>
+        </div>
+        <div class="control-group">
+          <label class="control-label" for="longitude">Longitude</label>
+          <div class="controls">
+            <div class="input-append">
+              <input type="text" id="longitude" placeholder="">
+              <span class="add-on">° (degrees E/W)</span>
+            </div>
+          </div>
+        </div>
+      </fieldset>
+
+      <div class="form-actions">
+        <button type="submit" class="btn">Create Spectrum Block</button>
+      </div>
+    
+    </form>
+  </div>
+
+  <div class="offset1 span5">
+    <h2>Spectrum Request</h2>
+    <p>This request will be sent to the /offers/ URL:</p>
+
+    <pre>
+{
+  "@context": "https://w3id.org/spectrum/v1"
+  "centerFrequency": "",
+  "occupiedBandwidth": "",
+  "transmitPower": "",
+  "latitude": "",
+  "longitude": "",
+  "validFrom": "",
+  "validUntil": ""
+}</pre>
+
+  </div>
+</div>
+
+<div class="row">
+  <div class="offset2 span8">
+    <h2>Current Spectrum Block Offers</h2>
+
+    <table class="table" style="text-align: center;">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Center Frequency (Mhz)</th>
+          <th>Occupied Bandwidth (MHz)</th>
+          <th>Transmit Power (dBm)</th>
+          <th>Location</th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for offer in offers %}
+        <tr>
+          <td>{{offer.id}}</td>
+          <td>{{offer.data['@graph'][0].spectrum.centerFrequency}}</td>
+          <td>{{offer.data['@graph'][0].spectrum.occupiedBandwidth}}</td>
+          <td>{{offer.data['@graph'][0].spectrum.transmitPower}}</td>
+          <td>x, y</td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
   </div>
 </div>
 {% endblock %}
