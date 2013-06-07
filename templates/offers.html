@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 {% block body %}
-<div class="row">
+<div class="row" data-ng-controller="SpectrumBlockController" data-ng-cloak>
   <div class="offset1 span5">
     <h2>Spectrum Block Request</h2>
 
@@ -10,7 +10,7 @@
           <label class="control-label" for="centerFrequency">Center Frequency</label>
           <div class="controls">
             <div class="input-append">
-              <input type="text" id="centerFrequency" placeholder="">
+              <input type="text" id="centerFrequency" data-ng-model="model.centerFrequency">
               <span class="add-on">hz</span>
             </div>
           </div>
@@ -19,7 +19,7 @@
           <label class="control-label" for="occupiedBandwidth">Occupied Bandwidth</label>
           <div class="controls">
             <div class="input-append">
-              <input type="text" id="occupiedBandwidth" placeholder="">
+              <input type="text" id="occupiedBandwidth" data-ng-model="model.occupiedBandwidth">
               <span class="add-on">hz</span>
             </div>
           </div>
@@ -28,7 +28,7 @@
           <label class="control-label" for="transmitPower">Transmit Power</label>
           <div class="controls">
             <div class="input-append">
-              <input type="text" id="transmitPower" placeholder="">
+              <input type="text" id="transmitPower" data-ng-model="model.transmitPower">
               <span class="add-on">dBm</span>
             </div>
           </div>
@@ -37,7 +37,7 @@
           <label class="control-label" for="latitude">Latitude</label>
           <div class="controls">
             <div class="input-append">
-              <input type="text" id="latitude" placeholder="">
+              <input type="text" id="latitude" data-ng-model="model.latitude">
               <span class="add-on">° (degrees N/S)</span>
             </div>
           </div>
@@ -46,8 +46,26 @@
           <label class="control-label" for="longitude">Longitude</label>
           <div class="controls">
             <div class="input-append">
-              <input type="text" id="longitude" placeholder="">
+              <input type="text" id="longitude" data-ng-model="model.longitude">
               <span class="add-on">° (degrees E/W)</span>
+            </div>
+          </div>
+        </div>
+        <div class="control-group">
+          <label class="control-label" for="validFrom">Valid From</label>
+          <div class="controls">
+            <div class="input-append">
+              <input type="text" id="validFrom" data-ng-model="model.validFrom">
+              <span class="add-on">time</span>
+            </div>
+          </div>
+        </div>
+        <div class="control-group">
+          <label class="control-label" for="validUntil">Valid Until</label>
+          <div class="controls">
+            <div class="input-append">
+              <input type="text" id="validUntil" data-ng-model="model.validUntil">
+              <span class="add-on">time</span>
             </div>
           </div>
         </div>
@@ -64,22 +82,23 @@
     <h2>Spectrum Request</h2>
     <p>This request will be sent to the /offers/ URL:</p>
 
-    <pre>
-{
+{% raw %}
+    <pre>{
   "@context": "https://w3id.org/spectrum/v1"
-  "centerFrequency": "",
-  "occupiedBandwidth": "",
-  "transmitPower": "",
-  "latitude": "",
-  "longitude": "",
-  "validFrom": "",
-  "validUntil": ""
+  "centerFrequency": "{{model.centerFrequency}}",
+  "occupiedBandwidth": "{{model.occupiedBandwidth}}",
+  "transmitPower": "{{model.transmitPower}}",
+  "latitude": "{{model.latitude}}",
+  "longitude": "{{model.longitude}}",
+  "validFrom": "{{model.validFrom}}",
+  "validUntil": "{{model.validUntil}}"
 }</pre>
+{% endraw %}
 
   </div>
 </div>
 
-<div class="row">
+<div class="row" data-ng-controller="SpectrumListController" data-ng-cloak>
   <div class="offset2 span8">
     <h2>Current Spectrum Block Offers</h2>
 
@@ -107,5 +126,7 @@
     </table>
   </div>
 </div>
+
+<script src="{{ url_for('static', filename='offers.js') }}"></script>
 {% endblock %}
 

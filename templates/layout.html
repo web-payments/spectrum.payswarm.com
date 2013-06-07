@@ -1,10 +1,13 @@
 <!doctype html>
-<html>
+<html data-ng-app="spectrum">
 <head>
   <title>Spectrum: Dynamic Spectrum Marketplace Demo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css">
   <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.2/jquery.min.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.0.7/angular.min.js"></script>
+  <script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
 </head>
 <body>
   <div class="navbar navbar-fixed-top">
@@ -34,9 +37,5 @@
   {% endfor %}
   {% block body %}{% endblock %}
   </div>
-
-  <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.2/jquery.min.js"></script>
-  <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.0.7/angular.min.js"></script>
-  <script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
 </body>
 </html>
