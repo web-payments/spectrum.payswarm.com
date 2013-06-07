@@ -99,29 +99,33 @@
 </div>
 
 <div class="row" data-ng-controller="SpectrumListController" data-ng-cloak>
-  <div class="offset2 span8">
+  <div class="offset1 span10">
     <h2>Current Spectrum Block Offers</h2>
 
     <table class="table" style="text-align: center;">
       <thead>
         <tr>
-          <th>ID</th>
+          <th>Valid From</th>
+          <th>Valid Until</th>
           <th>Center Frequency (Mhz)</th>
           <th>Occupied Bandwidth (MHz)</th>
           <th>Transmit Power (dBm)</th>
-          <th>Location</th>
+          <th>Latitude</th>
+          <th>Longitude</th>
         </tr>
       </thead>
       <tbody>
-      {% for offer in offers %}
-        <tr>
-          <td>{{offer.id}}</td>
-          <td>{{offer.data['@graph'][0].spectrum.centerFrequency}}</td>
-          <td>{{offer.data['@graph'][0].spectrum.occupiedBandwidth}}</td>
-          <td>{{offer.data['@graph'][0].spectrum.transmitPower}}</td>
-          <td>x, y</td>
+{% raw %}
+        <tr data-ng-repeat="offer in model.offers">
+          <td>{{offer.asset.spectrum.validFrom}}</td>
+          <td>{{offer.asset.spectrum.validUntil}}</td>
+          <td>{{offer.asset.spectrum.centerFrequency}}</td>
+          <td>{{offer.asset.spectrum.occupiedBandwidth}}</td>
+          <td>{{offer.asset.spectrum.transmitPower}}</td>
+          <td>{{offer.asset.spectrum.latitude}}</td>
+          <td>{{offer.asset.spectrum.longitude}}</td>
         </tr>
-      {% endfor %}
+{% endraw %}
       </tbody>
     </table>
   </div>

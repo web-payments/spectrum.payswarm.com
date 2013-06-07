@@ -29,6 +29,7 @@ spectrumApp.controller('SpectrumBlockController', function($scope, $http) {
   var tomorrow = new Date();
   tomorrow.setDate(today.getDate() + 1);
 
+  // initialize the spectrum block model with something sane
   $scope.model = {
     centerFrequency: '' + (50000000 + Math.floor((Math.random() * 850000) * 1000)),
     occupiedBandwidth: '' + (1000000 + Math.floor((Math.random() * 50000) * 1000)),
@@ -42,5 +43,16 @@ spectrumApp.controller('SpectrumBlockController', function($scope, $http) {
 });
 
 spectrumApp.controller('SpectrumListController', function($scope, $http) {
+  $scope.model = {offers: []};
 
+  $http.get('/offers/', {headers: {'Accept': 'application/ld+json'}})
+    .success(function(data, status) {
+      $scope.model.offers.length = 0;
+      for(i in data) {
+        var offer = data[i];
+        $scope.model.offers.push(
+          {'asset': offer['@graph'][0], 'listing': offer['@graph'][0]});
+      }
+  });
+  
 });
