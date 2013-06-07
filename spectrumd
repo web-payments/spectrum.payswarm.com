@@ -33,7 +33,6 @@ import os.path, json, time
 from sqlite3 import dbapi2 as sqlite3
 from flask import Flask, request, session, g, redirect, url_for, abort, \
      jsonify, render_template, flash, _app_ctx_stack, make_response
-from flask_negotiate import consumes, produces
 
 # configuration
 DATABASE = os.path.join(os.path.dirname(__file__), 'spectrum.db')
